@@ -9,7 +9,7 @@
 ;; Version: 0.1.0
 ;; Keywords: convenience, frames
 ;; Homepage: https://github.com/tecosaur/emacs-everywhere
-;; Package-Requires: ((emacs "26.3"))
+;; Package-Requires: ((emacs "26.3") (with-editor "0"))
 
 ;;; License:
 
@@ -24,6 +24,7 @@
 
 (require 'cl-lib)
 (require 'server)
+(require 'with-editor)
 
 (defgroup emacs-everywhere ()
   "Customise group for Emacs-everywhere."
@@ -241,6 +242,12 @@ emacs-everywhere--app-info-* functions for reference."
   :type 'function
   :group 'emacs-everywhere)
 
+(defcustom emacs-everywhere-emacsclient-executable
+  (with-editor-locate-emacsclient)
+  "Executable of emacsclient."
+  :type 'file
+  :group 'emacs-everywhere)
+
 ;; Semi-internal variables
 
 (defconst emacs-everywhere-osascript-accessibility-error-message
@@ -276,7 +283,7 @@ This may open FILE at a particular LINE and COLUMN, if specified."
     (pcase system-type
       ((or 'ms-dos 'windows-nt 'cygwin)
        (w32-shell-execute "open" "emacsclientw" param-string 1))
-      (_ (apply #'call-process "emacsclient" nil 0 nil param)))))
+      (_ (apply #'call-process emacs-everywhere-emacsclient-executable nil 0 nil param)))))
 
 (defun emacs-everywhere-command-param (app-info &optional file line column)
   "Generate arguments for calling emacsclient.
